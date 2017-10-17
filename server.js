@@ -8,6 +8,9 @@
 var fs = require('fs');
 var express = require('express');
 var app = express();
+var search = require('node-google-image-search')
+
+app.enable('trust proxy')
 
 if (!process.env.DISABLE_XORIGIN) {
   app.use(function(req, res, next) {
@@ -34,8 +37,26 @@ app.route('/_api/package.json')
   });
   
 app.route('/')
-    .get(function(req, res) {
+    .get(function(req, res){
 		  res.sendFile(process.cwd() + '/views/index.html');
+         })
+
+app.route('/:str')
+    .get(function(req, res) {
+    var offset = req.query.offset || 10;
+    search(req.params.str, function(data){
+      var results = [];
+      data.forEach(function(item, index, arr){
+        results[index] = {
+          url: item.link,
+          snippet: item.snippet,
+          thumbnail: item.image.thumbnailLink,
+          context: item.image.contextLink
+        }
+      })
+      
+      res.end(JSON.stringify(results));
+    }, offset, 10)
     })
 
 // Respond not found to all the wrong routes

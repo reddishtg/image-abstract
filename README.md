@@ -1,1 +1,1 @@
-# Backend Challenges boilerplate - package.json
+# FCC's Image Search Abstraction Layer Project
